@@ -1,0 +1,8 @@
+streamlit
+pandas
+plotly
+nba_api
+mysql-connector-python
+scikit-learn
+joblib
+python-dotenv
