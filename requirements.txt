@@ -6,3 +6,5 @@ mysql-connector-python
 scikit-learn
 joblib
 python-dotenv
+seaborn 
+matplotlib
