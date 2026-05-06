@@ -211,7 +211,54 @@ def load_lineup_players():
 
 
 def load_shots():
-    pass
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    df = pd.read_csv('data/shot_data_2025_26.csv')
+    df.columns = df.columns.str.lower()
+
+    # convert date format to MySQL compatible
+    df['game_date'] = pd.to_datetime(df['game_date'], format='%Y%m%d').dt.strftime('%Y-%m-%d')
+
+    # keep only the columns needed
+    df = df[['game_id', 'game_event_id', 'player_id', 'team_id', 'period',
+             'minutes_remaining', 'seconds_remaining', 'action_type', 'shot_type',
+             'shot_zone_basic', 'shot_zone_area', 'shot_zone_range', 'shot_distance',
+             'loc_x', 'loc_y', 'shot_made_flag', 'game_date']]
+
+    for _, row in df.iterrows():
+        cursor.execute("""
+            INSERT INTO shots (game_id, game_event_id, player_id, team_id, period,
+                minutes_remaining, seconds_remaining, action_type, shot_type,
+                shot_zone_basic, shot_zone_area, shot_zone_range, shot_distance,
+                loc_x, loc_y, shot_made_flag, game_date)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            row['game_id'],
+            row['game_event_id'],
+            row['player_id'],
+            row['team_id'],
+            row['period'],
+            row['minutes_remaining'],
+            row['seconds_remaining'],
+            row['action_type'],
+            row['shot_type'],
+            row['shot_zone_basic'],
+            row['shot_zone_area'],
+            row['shot_zone_range'],
+            row['shot_distance'],
+            row['loc_x'],
+            row['loc_y'],
+            row['shot_made_flag'],
+            row['game_date']
+        ))
+
+    conn.commit()
+    conn.close()
+    print("Shots loaded")
+
+
 
 
 
@@ -223,7 +270,7 @@ def main():
     load_player_season_stats()
     load_lineups()
     load_lineup_players()
-    #load_shots()
+    load_shots()
 
 if __name__ == "__main__":
     main()
