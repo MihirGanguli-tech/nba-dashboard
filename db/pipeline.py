@@ -9,6 +9,7 @@ from db.connection import get_connection
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import CommonTeamRoster
 from nba_api.stats.endpoints import LeagueDashPlayerStats
+from nba_api.stats.endpoints import LeagueDashLineups
 
 
 
@@ -147,9 +148,68 @@ def load_player_season_stats():
 
 
 def load_lineups():
-    pass
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    all_lineup_stats = LeagueDashLineups(season = '2025-26', timeout = 60)
+    df = all_lineup_stats.get_data_frames()[0]
+    df.columns = df.columns.str.lower()
+    #keeping only what will be inserted into the table
+    df = df[['group_id', 'group_name', 'team_id', 'gp', 'min', 'pts', 'ast', 'reb', 'stl', 'blk', 'plus_minus', 'fg_pct', 'fg3_pct']]
+    for _, row in df.iterrows():
+        cursor.execute("""
+            INSERT INTO lineups (group_id, group_name, team_id, gp, min, pts, ast, reb, stl, blk, plus_minus, fg_pct, fg3_pct)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            row['group_id'],
+            row['group_name'],
+            row['team_id'],
+            row['gp'],
+            row['min'],
+            row['pts'],
+            row['ast'],
+            row['reb'],
+            row['stl'],
+            row['blk'],
+            row['plus_minus'],
+            row['fg_pct'],
+            row['fg3_pct']
+        ))
+
+    conn.commit()
+    conn.close()
+    print("Lineups loaded")
+
+
+
+
+
 def load_lineup_players():
-    pass
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    all_lineup_stats = LeagueDashLineups(season = '2025-26', timeout=60)
+    df = all_lineup_stats.get_data_frames()[0]
+    df.columns = df.columns.str.lower()
+
+    for _, row in df.iterrows():
+
+        group_id = row['group_id']
+        #split into individual player ids
+        player_ids = group_id.strip('-').split('-')
+
+        for player_id in player_ids:
+            cursor.execute("INSERT INTO lineup_players (group_id, player_id) VALUES (%s, %s)", (group_id, player_id))
+
+    conn.commit()
+    conn.close()
+    print("lineup_players loaded")
+
+
+
+
 def load_shots():
     pass
 
@@ -161,8 +221,8 @@ def main():
     load_teams()
     load_players()
     load_player_season_stats()
-    #load_lineups()
-    #load_lineup_players()
+    load_lineups()
+    load_lineup_players()
     #load_shots()
 
 if __name__ == "__main__":
