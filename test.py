@@ -1,6 +1,7 @@
-from nba_api.stats.endpoints import CommonTeamRoster
+from nba_api.stats.endpoints import LeagueDashPlayerStats
 
-roster = CommonTeamRoster(team_id=1610612737, season='2025-26')
-df =roster.get_data_frames()
-print(df[0])
+stats = LeagueDashPlayerStats(season='2025-26')
+df = stats.get_data_frames()[0]
+print(df.columns.tolist())
 
+print(df.head(2))

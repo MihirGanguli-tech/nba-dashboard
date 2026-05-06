@@ -2,12 +2,13 @@ import sys
 import os
 #was having trouble, file was not running from project root
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+import time
 import pandas as pd
 
 from db.connection import get_connection
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import CommonTeamRoster
+from nba_api.stats.endpoints import LeagueDashPlayerStats
 
 
 
@@ -66,7 +67,8 @@ def load_players():
 
         team_id = team['id']
         #list of dataframes containing team rosters
-        roster = CommonTeamRoster(team_id=team_id, season='2025-26')
+        roster = CommonTeamRoster(team_id=team_id, season='2025-26', timeout = 60)
+        time.sleep(2)
         df = roster.get_data_frames()[0]
         #make all column names lowercase to match sql database
         df.columns = df.columns.str.lower()
@@ -103,7 +105,47 @@ def load_players():
 
 
 def load_player_season_stats():
-    pass
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    all_player_stats = LeagueDashPlayerStats(season = '2025-26', timeout=60)
+    df = all_player_stats.get_data_frames()[0]
+
+    df.columns = df.columns.str.lower()
+    df = df[['player_id', 'gp', 'min', 'pts', 'reb', 'ast', 'stl', 'blk', 'fg_pct', 'fg3_pct', 'ft_pct', 'plus_minus']]
+    #hardcode a season column
+    df['season'] = '2025-26'
+    for _, row in df.iterrows():
+        cursor.execute("""
+        INSERT INTO player_season_stats (player_id, gp, min, pts, reb, ast, stl, blk, fg_pct, fg3_pct, ft_pct, plus_minus, season)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """,(
+            row['player_id'],
+            row['gp'],
+            row['min'],
+            row['pts'],
+            row['reb'],
+            row['ast'],
+            row['stl'],
+            row['blk'],
+            row['fg_pct'],
+            row['fg3_pct'],
+            row['ft_pct'],
+            row['plus_minus'],
+            row['season']
+
+        ))
+    
+    conn.commit()
+    conn.close()
+    print("All player stats loaded")
+
+
+
+
+
+
 def load_lineups():
     pass
 def load_lineup_players():
@@ -118,7 +160,7 @@ def main():
     clear_tables()
     load_teams()
     load_players()
-    #load_player_season_stats()
+    load_player_season_stats()
     #load_lineups()
     #load_lineup_players()
     #load_shots()
