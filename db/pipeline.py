@@ -80,20 +80,20 @@ def load_players():
 
         df = df[['player_id', 'teamid', 'player', 'num', 'position', 'height', 'weight', 'age']]
 
-    for _, row in df.iterrows():
-        cursor.execute("""
-            INSERT INTO players (player_id, team_id, player, num, position, height, weight, age)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-            row['player_id'],
-            row['teamid'],
-            row['player'],
-            row['num'] if pd.notna(row['num']) else None,
-            row['position'] if pd.notna(row['position']) else None,
-            row['height'] if pd.notna(row['height']) else None,
-            row['weight'] if pd.notna(row['weight']) else None,
-            row['age'] if pd.notna(row['age']) else None
-        ))
+        for _, row in df.iterrows():
+            cursor.execute("""
+                INSERT INTO players (player_id, team_id, player, num, position, height, weight, age)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                row['player_id'],
+                row['teamid'],
+                row['player'],
+                row['num'] if pd.notna(row['num']) else None,
+                row['position'] if pd.notna(row['position']) else None,
+                row['height'] if pd.notna(row['height']) else None,
+                row['weight'] if pd.notna(row['weight']) else None,
+                row['age'] if pd.notna(row['age']) else None
+            ))
 
     conn.commit()
     conn.close()
