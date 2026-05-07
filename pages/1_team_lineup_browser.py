@@ -20,6 +20,7 @@ selected_team = st.selectbox("Select a team", team_names)
 
 selected_team_id = team_dict[selected_team]
 
+#fetch lineups for the selected team
 conn = get_connection()
 cursor = conn.cursor()
 cursor.execute("SELECT group_name, gp, min, pts, reb, ast, plus_minus FROM lineups WHERE team_id = %s ORDER BY plus_minus DESC;", (selected_team_id,))
@@ -27,6 +28,8 @@ results = cursor.fetchall()
 conn.close()
 
 df = pd.DataFrame(results, columns=['Lineup', 'Games Played', 'MIN', 'PTS', 'REB', 'AST', 'Plus/Minus'])
+#round minutes to one decimal point for readability
+df['MIN'] = df['MIN'].round(1)
 
 st.subheader(f"{selected_team} Lineups")
 st.dataframe(df, use_container_width=True)
