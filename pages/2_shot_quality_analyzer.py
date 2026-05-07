@@ -4,7 +4,7 @@ import plotly.express as px
 from db.connection import get_connection
 
 st.set_page_config(page_title="Shot Quality Analyzer", layout="wide")
-st.title("🏀 Shot Quality Analyzer")
+st.title("NBA Shot Quality Analyzer")
 
 mode = st.sidebar.radio("View by", ["Team", "Player"])
 
