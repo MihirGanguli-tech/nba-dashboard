@@ -10,6 +10,7 @@ from nba_api.stats.static import teams
 from nba_api.stats.endpoints import CommonTeamRoster
 from nba_api.stats.endpoints import LeagueDashPlayerStats
 from nba_api.stats.endpoints import LeagueDashLineups
+from nba_api.stats.endpoints import ShotChartDetail
 
 
 
@@ -210,57 +211,64 @@ def load_lineup_players():
 
 
 
-def load_shots():
+def load_shot_data():
 
     conn = get_connection()
     cursor = conn.cursor()
+    regular = ShotChartDetail(
+        team_id=0,
+        player_id=0,
+        season_type_all_star='Regular Season',
+        season_nullable='2025-26',
+        timeout=60
+    )
+    time.sleep(2)
+    playoffs = ShotChartDetail(
+        team_id=0,
+        player_id=0,
+        season_type_all_star='Playoffs',
+        season_nullable='2025-26',
+        timeout=60
+    )
 
-    df = pd.read_csv('data/shot_data_2025_26.csv')
+    df_regular = regular.get_data_frames()[0]
+    df_playoffs = playoffs.get_data_frames()[0]
+
+
+    df = pd.concat([df_regular, df_playoffs], ignore_index=True)
+    df.to_csv('data/shot_data_2025_26.csv', index=False)
+
     df.columns = df.columns.str.lower()
-
-    # convert date format to MySQL compatible
+    #SQL datetime format
     df['game_date'] = pd.to_datetime(df['game_date'], format='%Y%m%d').dt.strftime('%Y-%m-%d')
 
-    # keep only the columns needed
-    df = df[['game_id', 'game_event_id', 'player_id', 'team_id', 'period',
-             'minutes_remaining', 'seconds_remaining', 'action_type', 'shot_type',
-             'shot_zone_basic', 'shot_zone_area', 'shot_zone_range', 'shot_distance',
-             'loc_x', 'loc_y', 'shot_made_flag', 'game_date']]
-
-    for _, row in df.iterrows():
-        cursor.execute("""
+    for idx, row in df.iterrows():
+        try:
+            cursor.execute("""
             INSERT INTO shots (game_id, game_event_id, player_id, team_id, period,
                 minutes_remaining, seconds_remaining, action_type, shot_type,
                 shot_zone_basic, shot_zone_area, shot_zone_range, shot_distance,
                 loc_x, loc_y, shot_made_flag, game_date)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
-            row['game_id'],
-            row['game_event_id'],
-            row['player_id'],
-            row['team_id'],
-            row['period'],
-            row['minutes_remaining'],
-            row['seconds_remaining'],
-            row['action_type'],
-            row['shot_type'],
-            row['shot_zone_basic'],
-            row['shot_zone_area'],
-            row['shot_zone_range'],
-            row['shot_distance'],
-            row['loc_x'],
-            row['loc_y'],
-            row['shot_made_flag'],
-            row['game_date']
+            row['game_id'], row['game_event_id'], row['player_id'], row['team_id'],
+            row['period'], row['minutes_remaining'], row['seconds_remaining'],
+            row['action_type'], row['shot_type'], row['shot_zone_basic'],
+            row['shot_zone_area'], row['shot_zone_range'], row['shot_distance'],
+            row['loc_x'], row['loc_y'], row['shot_made_flag'], row['game_date']
         ))
+        except Exception as e:
+            print(f"Error on row {idx}: {e}")
+            break
 
     conn.commit()
     conn.close()
     print("Shots loaded")
+    print(f"CSV rows: {len(df)}")
 
 
 
-
+    
 
 
 def main():
@@ -270,7 +278,7 @@ def main():
     load_player_season_stats()
     load_lineups()
     load_lineup_players()
-    load_shots()
+    load_shot_data()
 
 if __name__ == "__main__":
     main()
