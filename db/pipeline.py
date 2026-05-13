@@ -12,7 +12,7 @@ from nba_api.stats.endpoints import LeagueDashPlayerStats
 from nba_api.stats.endpoints import LeagueDashLineups
 from nba_api.stats.endpoints import ShotChartDetail
 
-season = '2025-26'
+season = '2023-24'
 
 def clear_tables():
     """
@@ -238,7 +238,6 @@ def load_shot_data():
 
 
     df = pd.concat([df_regular, df_playoffs], ignore_index=True)
-    df.to_csv(f'data/shot_data_{season}.csv', index=False)
 
     df.columns = df.columns.str.lower()
     #SQL datetime format
