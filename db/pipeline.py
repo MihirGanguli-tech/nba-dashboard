@@ -117,7 +117,7 @@ def load_player_season_stats():
     df.columns = df.columns.str.lower()
     df = df[['player_id', 'gp', 'min', 'pts', 'reb', 'ast', 'stl', 'blk', 'fg_pct', 'fg3_pct', 'ft_pct', 'plus_minus']]
     #hardcode a season column
-    df['season'] = '2025-26'
+    df['season'] = season
     for _, row in df.iterrows():
         cursor.execute("""
         INSERT INTO player_season_stats (player_id, gp, min, pts, reb, ast, stl, blk, fg_pct, fg3_pct, ft_pct, plus_minus, season)
