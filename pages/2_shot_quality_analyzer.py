@@ -50,6 +50,8 @@ if mode == "Player":
      
 rows = cursor.fetchall()
 df = pd.DataFrame(rows, columns=["zone_basic", "zone_area", "shot_made", "loc_x", "loc_y", "action_type"])
+
+
 #group actions into smaller categories
 df['action_type']= df['action_type'].apply(
     lambda x: 'Layup' if 'Layup' in x else
@@ -69,6 +71,7 @@ if selected_action != "All":
     df = df[df["action_type"] == selected_action]
 
 
+#see shooting percentages for different areas of the court
 df_grouped_by_shotzone = df.groupby('zone_basic')['shot_made'].agg(
     FGA = 'count',
     FGM = 'sum',
@@ -97,14 +100,17 @@ st.plotly_chart(fig_action, use_container_width=True)
 
 
 
-df["shot_made"] = df["shot_made"].astype(str)
 
 st.subheader("Zone Efficiency")
+
+df_chart = df.copy()
+df_chart["shot_made"] = df_chart["shot_made"].astype(str)
+
 
 st.subheader("Shot Chart")
 
 fig = px.scatter(
-    df,
+    df_chart,
     x="loc_x",
     y="loc_y",
     color="shot_made",

@@ -12,7 +12,7 @@ from nba_api.stats.endpoints import LeagueDashPlayerStats
 from nba_api.stats.endpoints import LeagueDashLineups
 from nba_api.stats.endpoints import ShotChartDetail
 
-
+season = '2025-26'
 
 def clear_tables():
     """
@@ -69,7 +69,7 @@ def load_players():
 
         team_id = team['id']
         #list of dataframes containing team rosters
-        roster = CommonTeamRoster(team_id=team_id, season='2025-26', timeout = 60)
+        roster = CommonTeamRoster(team_id=team_id, season=season, timeout = 60)
         time.sleep(2)
         df = roster.get_data_frames()[0]
         #make all column names lowercase to match sql database
@@ -111,7 +111,7 @@ def load_player_season_stats():
     conn = get_connection()
     cursor = conn.cursor()
 
-    all_player_stats = LeagueDashPlayerStats(season = '2025-26', timeout=60)
+    all_player_stats = LeagueDashPlayerStats(season = season, timeout=60)
     df = all_player_stats.get_data_frames()[0]
 
     df.columns = df.columns.str.lower()
@@ -153,7 +153,7 @@ def load_lineups():
     conn = get_connection()
     cursor = conn.cursor()
 
-    all_lineup_stats = LeagueDashLineups(season = '2025-26', timeout = 60)
+    all_lineup_stats = LeagueDashLineups(season = season, timeout = 60)
     df = all_lineup_stats.get_data_frames()[0]
     df.columns = df.columns.str.lower()
     #keeping only what will be inserted into the table
@@ -191,7 +191,7 @@ def load_lineup_players():
     conn = get_connection()
     cursor = conn.cursor()
 
-    all_lineup_stats = LeagueDashLineups(season = '2025-26', timeout=60)
+    all_lineup_stats = LeagueDashLineups(season = season, timeout=60)
     df = all_lineup_stats.get_data_frames()[0]
     df.columns = df.columns.str.lower()
 
@@ -219,7 +219,8 @@ def load_shot_data():
         team_id=0,
         player_id=0,
         season_type_all_star='Regular Season',
-        season_nullable='2025-26',
+        season_nullable=season,
+        context_measure_simple='FGA',
         timeout=60
     )
     time.sleep(2)
@@ -227,7 +228,8 @@ def load_shot_data():
         team_id=0,
         player_id=0,
         season_type_all_star='Playoffs',
-        season_nullable='2025-26',
+        season_nullable=season,
+        context_measure_simple='FGA',
         timeout=60
     )
 
@@ -236,7 +238,7 @@ def load_shot_data():
 
 
     df = pd.concat([df_regular, df_playoffs], ignore_index=True)
-    df.to_csv('data/shot_data_2025_26.csv', index=False)
+    df.to_csv(f'data/shot_data_{season}.csv', index=False)
 
     df.columns = df.columns.str.lower()
     #SQL datetime format
