@@ -22,7 +22,7 @@ jobs:
         run: pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Debug nba_api
-        run: python -c "import nba_api.library.http:print(dir(nba_api.libary.http))"
+        run: python -c "import nba_api.library.http;print(dir(nba_api.libary.http))"
 
       - name: Run pipeline
         env:
