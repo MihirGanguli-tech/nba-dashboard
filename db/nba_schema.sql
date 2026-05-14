@@ -1,13 +1,14 @@
-CREATE DATABASE IF NOT EXISTS nba_dashboard;
-USE nba_dashboard;
+CREATE DATABASE nba_dashboard;
+
+\c nba_dashboard;
 
 CREATE TABLE teams (
-    team_id INT PRIMARY KEY NOT NULL,
+    team_id INT PRIMARY KEY,
     team_name VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE players (
-    player_id INT PRIMARY KEY NOT NULL,
+    player_id INT PRIMARY KEY,
     team_id INT NOT NULL,
     player VARCHAR(50) NOT NULL,
     num VARCHAR(3),
@@ -37,7 +38,7 @@ CREATE TABLE player_season_stats (
 );
 
 CREATE TABLE lineups (
-    group_id VARCHAR(50) NOT NULL,
+    group_id VARCHAR(50) PRIMARY KEY,
     group_name VARCHAR(200) NOT NULL,
     team_id INT NOT NULL,
     gp INT,
@@ -50,7 +51,6 @@ CREATE TABLE lineups (
     plus_minus FLOAT,
     fg_pct FLOAT,
     fg3_pct FLOAT,
-    PRIMARY KEY (group_id),
     FOREIGN KEY (team_id) REFERENCES teams(team_id)
 );
 
