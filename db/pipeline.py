@@ -11,7 +11,26 @@ from nba_api.stats.endpoints import LeagueDashLineups
 from nba_api.stats.endpoints import ShotChartDetail
 from psycopg2.extras import execute_batch
 
+
+
+from nba_api.library.http import NBAStatsHTTP
+
+NBAStatsHTTP.headers = {
+    'Host': 'stats.nba.com',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'x-nba-stats-origin': 'stats',
+    'x-nba-stats-token': 'true',
+    'Connection': 'keep-alive',
+    'Referer': 'https://www.nba.com/',
+    'Origin': 'https://www.nba.com',
+}
+
 season = '2025-26'
+timeout_time = 120
+
 
 def clear_tables():
     #empty all of the tables to avoid inserting duplicates
@@ -82,7 +101,7 @@ def load_player_season_stats():
     conn = get_connection()
     cursor = conn.cursor()
     #fetching every players box stats from the api
-    all_player_stats = LeagueDashPlayerStats(season=season, timeout=60)
+    all_player_stats = LeagueDashPlayerStats(season=season, timeout=timeout_time)
     df = all_player_stats.get_data_frames()[0]
 
     df.columns = df.columns.str.lower()
@@ -105,7 +124,7 @@ def load_lineups():
     conn = get_connection()
     cursor = conn.cursor()
     #all lineup stats for each team, combinations of players
-    all_lineup_stats = LeagueDashLineups(season=season, timeout=60)
+    all_lineup_stats = LeagueDashLineups(season=season, timeout=timeout_time)
     df = all_lineup_stats.get_data_frames()[0]
     df.columns = df.columns.str.lower()
     df = df[['group_id', 'group_name', 'team_id', 'gp', 'min', 'pts', 'ast', 'reb', 'stl', 'blk', 'plus_minus', 'fg_pct', 'fg3_pct']]
@@ -126,7 +145,7 @@ def load_lineup_players():
     conn = get_connection()
     cursor = conn.cursor()
 
-    all_lineup_stats = LeagueDashLineups(season=season, timeout=60)
+    all_lineup_stats = LeagueDashLineups(season=season, timeout=timeout_time)
     df = all_lineup_stats.get_data_frames()[0]
     df.columns = df.columns.str.lower()
 
