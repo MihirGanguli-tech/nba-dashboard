@@ -23,7 +23,7 @@ NBAHTTP.headers = {
 }
 
 season = '2025-26'
-timeout_time = 120
+timeout_time = 300
 
 
 def clear_tables():
@@ -61,7 +61,7 @@ def load_players():
 
     for team in all_teams:
         team_id = team['id']
-        roster = CommonTeamRoster(team_id=team_id, season=season, timeout=60)
+        roster = CommonTeamRoster(team_id=team_id, season=season, timeout=timeout_time)
         time.sleep(2)
         df = roster.get_data_frames()[0]
         df.columns = df.columns.str.lower()
