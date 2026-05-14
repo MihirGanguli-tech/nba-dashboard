@@ -14,13 +14,13 @@ from psycopg2.extras import execute_batch
 
 
 from nba_api.library.http import NBAHTTP
-NBAHTTP.headers.update({
+NBAHTTP.headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Referer': 'https://www.nba.com/',
     'Origin': 'https://www.nba.com',
     'x-nba-stats-origin': 'stats',
     'x-nba-stats-token': 'true',
-})
+}
 
 season = '2025-26'
 timeout_time = 120
