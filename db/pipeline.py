@@ -27,10 +27,10 @@ timeout_time = 300
 
 
 def clear_tables():
-    #empty all of the tables to avoid inserting duplicates
+    #empty all of the tables except shots to avoid inserting duplicates
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("TRUNCATE TABLE shots, lineup_players, lineups, player_season_stats, players, teams RESTART IDENTITY CASCADE")
+    cursor.execute("TRUNCATE TABLE lineup_players, lineups, player_season_stats, players, teams RESTART IDENTITY CASCADE")
     conn.commit()
     conn.close()
     print("Tables cleared")
@@ -203,6 +203,7 @@ def load_shot_data():
             shot_zone_basic, shot_zone_area, shot_zone_range, shot_distance,
             loc_x, loc_y, shot_made_flag, game_date)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (game_id, game_event_id) DO NOTHING
     """, data, page_size=5000)
     print(f"Inserted {len(data)} rows")
 
