@@ -8,8 +8,7 @@ May take a while to load, on Streamlit's free tier the link shuts down after 7 d
 
 
 ## Overview
-
-CourtIQ ingests play-by-play shot data and team/lineup statistics directly from the NBA's stats API, stores them in a cloud Postgres database, and displays them through an interactive Streamlit dashboard.
+ Ingests play-by-play shot data and team/lineup statistics directly from the NBA's stats API, stores them in a cloud Postgres database, and displays them through an interactive Streamlit dashboard.
 
 **Current pages:**
 - **Team Lineup Browser** — explore real 5-man lineups by team, ranked by plus/minus
