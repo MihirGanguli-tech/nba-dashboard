@@ -68,6 +68,7 @@ nba_api (stats.nba.com)
 ## Design Decisions
 
 **Why PostgreSQL on Neon instead of local MySQL**
+
 The project started on local MySQL, but a cloud-hosted database was needed to deploy the dashboard on Streamlit Cloud without requiring users to run a local server. Neon's free Postgres tier covered the size of the database. The migration required converting `AUTO_INCREMENT` → `SERIAL`, dropping MySQL-specific foreign key syntax, and switching the driver from `mysql-connector-python` to `psycopg2`.
 
 **Why `execute_batch` over `executemany` or row-by-row inserts**
