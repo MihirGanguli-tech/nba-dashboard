@@ -76,6 +76,7 @@ The project started on local MySQL, but a cloud-hosted database was needed to de
 Row-by-row inserts required a separate network round trip to Neon for each of the 113,000 rows. execute_batch groups rows into batches of 5,000, reducing 113,000 round trips to around 23 and cutting total insert time from 20+ minutes to under 2 minutes.
 
 **Why `ON CONFLICT DO NOTHING` for shots instead of fully truncating and reloading on every refresh**
+
 Re-pulling and re-inserting all season shot data daily is wasteful because only new games need to be added. The `shots` table's primary key (`game_id`, `game_event_id`) makes each shot uniquely identifiable, so `ON CONFLICT DO NOTHING` allows the pipeline to safely re-run daily and only insert new rows. Reference tables (teams, players, lineups, season stats) are small enough that a full refresh does not significantly impact the load time and makes it easy to update rosters and lineups from trades or free agent signings.
 
 **Why GitHub Actions was abandoned for the daily refresh**
