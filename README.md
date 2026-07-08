@@ -2,7 +2,7 @@
 
 A  NBA analytics platform built with Streamlit, providing  lineup analysis and shot quality breakdowns for the 2025-26 NBA season.
 
-🔗 **Live app:** (https://m2ocj8vtrzzsfvf8rcww5n.streamlit.app/team_lineup_browser)
+**Live app:** (https://m2ocj8vtrzzsfvf8rcww5n.streamlit.app/team_lineup_browser)
 
 May take a while to load, on Streamlit's free tier the link shuts down after 7 days of inactivity and reboots when the URL is visited.
 
