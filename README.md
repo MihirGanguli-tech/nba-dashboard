@@ -81,7 +81,7 @@ Re-pulling and re-inserting all season shot data daily is wasteful because only 
 
 **Why GitHub Actions was abandoned for the daily refresh**
 
-Originally I planned the daily pipeline to run through Github Actions so that the pipeline was not depended on my computer. However, `stats.nba.com` appears to actively block cloud infrastructure IP ranges, causing consistent read timeouts. The pipeline remains on local Windows Task Scheduler.
+Originally I planned the daily pipeline to run through Github Actions so that the pipeline was not depended on my computer. However, `stats.nba.com` blocks cloud infrastructure IP ranges, causing read timeouts. The pipeline remains local on Windows Task Scheduler.
 
 
 
